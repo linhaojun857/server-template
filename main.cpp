@@ -1,4 +1,5 @@
 #include <cooper/net/AppTcpServer.hpp>
+#include <cooper/util/AsyncLogWriter.hpp>
 #include <dbng.hpp>
 #include <mysql.hpp>
 
@@ -15,6 +16,10 @@ struct Person {
 REFLECTION(Person, id, name, age)
 
 int main() {
+    AsyncLogWriter writer;
+    Logger::setLogLevel(Logger::kTrace);
+    Logger::setOutputFunction(std::bind(&AsyncLogWriter::write, &writer, std::placeholders::_1, std::placeholders::_2),
+                              std::bind(&AsyncLogWriter::flushAll, &writer));
     AppTcpServer server;
     dbng<mysql> mysql;
     bool ret;
